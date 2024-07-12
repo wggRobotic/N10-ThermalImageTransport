@@ -4,7 +4,7 @@
 #include <ostream>
 #include <rclcpp/rclcpp.hpp>
 #include <image_transport/image_transport.hpp>
-#include <sensor_msgs/msg/detail/compressed_image__struct.hpp>
+#include <sensor_msgs/msg/compressed_image.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
@@ -13,18 +13,13 @@ class ImageRepublisher : public rclcpp::Node
 {
 public:
     ImageRepublisher()
-        : Node("image_transport_publisher")
+        : Node("n10_image_transport_publisher")
     {}
     void init(image_transport::ImageTransport &it){
-        std::cout << "0" << std::endl;
-        image_pub_ = it.advertise("/camera/image", 1);
-        std::cout << "1" << std::endl;
+        image_pub_ = it.advertise("/n10/thermal/color", 1);
         msg = sensor_msgs::msg::Image();
-        std::cout << "2" << std::endl;
         msg.header.stamp = this->now();
-        std::cout << "3" << std::endl;
         msg.header.frame_id = "camera_frame";
-        std::cout << "4" << std::endl;
     }
     void setup(){
         
