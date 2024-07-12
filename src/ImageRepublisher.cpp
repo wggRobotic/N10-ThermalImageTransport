@@ -1,3 +1,4 @@
+#include <memory>
 #include <opencv2/core/hal/interface.h>
 #include <opencv2/imgcodecs.hpp>
 #include <ostream>
@@ -13,17 +14,22 @@ class ImageRepublisher : public rclcpp::Node
 public:
     ImageRepublisher()
         : Node("image_transport_publisher")
-    {
-        image_transport::ImageTransport it(shared_from_this());
+    {}
+    void init(image_transport::ImageTransport &it){
         std::cout << "0" << std::endl;
-        image_pub_ = it.advertise("camera/image", 1);
+        image_pub_ = it.advertise("/camera/image", 1);
         std::cout << "1" << std::endl;
-        image_sub = this->create_subscription<sensor_msgs::msg::CompressedImage>("/thermal_image/compressed", 10,std::bind(&ImageRepublisher::image_callback,this,std::placeholders::_1));
+        msg = sensor_msgs::msg::Image();
         std::cout << "2" << std::endl;
         msg.header.stamp = this->now();
         std::cout << "3" << std::endl;
         msg.header.frame_id = "camera_frame";
         std::cout << "4" << std::endl;
+    }
+    void setup(){
+        
+        image_sub = create_subscription<sensor_msgs::msg::CompressedImage>(
+            "/thermal_image/compressed", 10,std::bind(&ImageRepublisher::image_callback,this,std::placeholders::_1));
     }
 
 private:
@@ -54,11 +60,12 @@ private:
 
 int main(int argc, char **argv)
 {
-    std::cout << "started" << std::endl;
     rclcpp::init(argc, argv);
-    std::cout << "init" << std::endl;
-    rclcpp::spin(std::make_shared<ImageRepublisher>());
-    std::cout << "spin" << std::endl;
+    auto node = std::make_shared<ImageRepublisher>();
+    image_transport::ImageTransport it(node);
+    node->init(it);
+    node->setup();
+    rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
 }
