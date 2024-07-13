@@ -5,7 +5,7 @@ def generate_launch_description():
     return launch.LaunchDescription([
         launch_ros.actions.Node(
             package='thermal_image_transport',
-            executable='n10_image_transport_publisher',
+            executable='image_republisher',
         ),
         launch_ros.actions.Node(
             package='thermal_cam_publisher',
